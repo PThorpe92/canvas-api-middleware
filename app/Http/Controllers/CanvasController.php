@@ -28,7 +28,6 @@ class CanvasController extends Controller
             return redirect()->route('canvas-users')->with('error', $error['errors'][0]['message']);
         } else {
             $users = $response->json();
-            echo print_r($users);
             return view('users', ['users' => $users]);
         }
     }
@@ -45,10 +44,19 @@ class CanvasController extends Controller
     {
         $name = $request->input('name');
         $email = $request->input('email');
+        $terms = $request->input('terms_of_use');
 
         $userData = [
-            'name' => $name,
-            'email' => $email,
+            'user' => [
+                'name' => $name,
+                'skip_registration' => true,
+                'terms_of_use' => $terms
+            ],
+            'pseudonym' => [
+                'unique_id' => $email,
+                'send_confirmation' => false,
+            ],
+            'force_validations' => true,
             // Add other data needed to create a user in the Canvas API
         ];
 
@@ -63,8 +71,9 @@ class CanvasController extends Controller
         \Log::info($response->body());
 
         if ($response->successful()) {
-            $newUser = $response->json();
+            $newUser = $response->json_decode();
             $users = $this->getUsers(); // Get the list of users again after adding the new user
+
             return view('users', ['users' => $users, 'newUser' => $newUser]);
         } else {
             $error = $response->json();
