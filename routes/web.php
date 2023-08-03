@@ -16,3 +16,9 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
+
+use App\Http\Controllers\CanvasController;
+
+Route::get('/canvas-users', [CanvasController::class, 'getUsers'])->name('canvas-users');
+
+Route::post('/canvas-users/create', [CanvasController::class, 'createUser'])->name('canvas.create-user');
